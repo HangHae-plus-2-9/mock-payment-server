@@ -18,6 +18,13 @@ export class AppController {
 
   @Post('/payment')
   async payment(@Body() paymentInfo: PaymentInfo): Promise<any> {
+    if (!IS_SERVER_AVAILABLE) {
+      return {
+        status: 'error',
+        message: 'Server is down',
+      };
+    }
+
     console.log(paymentInfo);
 
     // Simulate some delay
