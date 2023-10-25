@@ -1,4 +1,5 @@
-import { Controller, Get, Post, Body } from '@nestjs/common';
+import { Controller, Get, Post, Body, Res } from '@nestjs/common';
+import { Response } from 'express';
 
 type PaymentInfo = {
   amount: number;
@@ -12,24 +13,36 @@ let IS_SERVER_AVAILABLE = true;
 @Controller()
 export class AppController {
   @Get('/status')
-  checkServerStatus(): string {
-    return IS_SERVER_AVAILABLE ? 'Server is available' : 'Server is down';
+  checkServerStatus(@Res() res: Response): any {
+    if (!IS_SERVER_AVAILABLE) {
+      return res.status(500).json({
+        status: 'error',
+        message: 'Server is down',
+      });
+    }
+    return res.status(200).json({
+      status: 'success',
+      message: 'Server is up',
+    });
   }
 
   @Post('/payment')
-  async payment(@Body() paymentInfo: PaymentInfo): Promise<any> {
+  async payment(
+    @Body() paymentInfo: PaymentInfo,
+    @Res() res: Response,
+  ): Promise<any> {
     if (!IS_SERVER_AVAILABLE) {
-      return {
+      return res.status(500).json({
         status: 'error',
         message: 'Server is down',
-      };
+      });
     }
 
     console.log(paymentInfo);
 
     // Simulate some delay
     await someDelay(jitter(500));
-    return {
+    return res.status(200).json({
       status: 'success',
       message: 'Payment is successful',
       data: {
@@ -39,19 +52,25 @@ export class AppController {
         expirationDate: paymentInfo.expirationDate,
         securityCode: paymentInfo.securityCode,
       },
-    };
+    });
   }
 
   @Post('/down')
-  down(): string {
+  down(@Res() res: Response): any {
     IS_SERVER_AVAILABLE = false;
-    return 'Server is down';
+    return res.status(200).json({
+      status: 'success',
+      message: 'Server is down',
+    });
   }
 
   @Post('/up')
-  up(): string {
+  up(@Res() res: Response): any {
     IS_SERVER_AVAILABLE = true;
-    return 'Server is up';
+    return res.status(200).json({
+      status: 'success',
+      message: 'Server is up',
+    });
   }
 }
 
