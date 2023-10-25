@@ -1,13 +1,20 @@
 # Mock payment Server
 
+## Description
+
+This is a mock payment server for testing.
+Use 8000 port for default.
+
 ## How to run
 
 ```bash
 npm install
-npm start
+npm run start:dev
 ```
 
 ## APIs
+
+- base url: http://localhost:8000
 
 - GET /status  
   - get server status
